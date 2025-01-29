@@ -9,5 +9,5 @@ export interface Loan {
   totalOverpayment: number;
   totalCost: number;
   repaymentTime: number;
-  profit: string;
+  profit: number;
 }
