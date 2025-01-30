@@ -1,31 +1,39 @@
 import { Component } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { AppState } from '../store/app.state';
+import { calculateLoan } from '../store/loan.actions';
+import { Loan } from '../models/loan.model';
+import { selectPaymentSchedule } from '../store/loan.selectors';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatTableModule } from '@angular/material/table';
-
-
-
-import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-loan-details',
   standalone: true,
-  imports: [ MatCardModule, CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatTableModule, MatButtonModule ],
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
   templateUrl: './loan-details.component.html',
-  styleUrl: './loan-details.component.scss'
+  styleUrls: ['./loan-details.component.scss']
 })
 export class LoanDetailsComponent {
+  loan: Loan = {
+    id: 1,
+    amount: 0,
+    interestRate: 0,
+    term: 0
+  };
 
-	displayedColumns: string[] = ['amount', 'interestRate', 'term'];
+  paymentSchedule$: Observable<any[]>; 
+  displayedColumns: string[] = ['month', 'monthlyPayment', 'principal', 'interest', 'remainingBalance'];
 
+  constructor(private store: Store<AppState>) {
+    this.paymentSchedule$ = this.store.select(selectPaymentSchedule);
+  }
 
-  loans = [
-    { amount: 10000, interestRate: 5, term: 12 },
-    { amount: 20000, interestRate: 4.5, term: 24 },
-    { amount: 15000, interestRate: 6, term: 36 }
-  ];
-
+  onSubmit() {
+    this.store.dispatch(calculateLoan({ loan: this.loan }));
+  }
 }
